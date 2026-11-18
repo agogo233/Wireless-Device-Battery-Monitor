@@ -13,7 +13,7 @@ SRC := $(wildcard src/*.cpp) $(wildcard src/drivers/*.cpp)
 OBJ := $(patsubst src/%.cpp,build/%.o,$(SRC)) build/app_res.o
 
 # HeadsetControl (third_party/HeadsetControl, GPL-3.0) is compiled into the exe as a static library.
-HSCLIB := build/hsc/lib/libheadsetcontrol.a
+HSCLIB := build/hsc/libheadsetcontrol.a
 
 WirelessBattery.exe: $(OBJ) $(HSCLIB)
 	$(CXX) $(LDFLAGS) $^ -o $@ $(LIBS)
