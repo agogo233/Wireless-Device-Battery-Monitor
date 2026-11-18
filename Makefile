@@ -1,16 +1,30 @@
 # Builds WirelessBattery.exe with MinGW-w64 (MSYS2 MINGW64/UCRT64 shell, or any mingw g++ on PATH).
+# Needs the HeadsetControl submodule (git submodule update --init), cmake, ninja and hidapi.
 CXX      ?= g++
 WINDRES  ?= windres
 CXXFLAGS ?= -std=c++17 -Os -Wall -Wno-missing-field-initializers -ffunction-sections -fdata-sections \
-            -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00
+            -Ithird_party/HeadsetControl/lib -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00
 LDFLAGS  ?= -municode -mwindows -static -s -Wl,--gc-sections
-LIBS     := -lhid -lsetupapi -lcfgmgr32 -lole32 -loleaut32 -lcomctl32 -lgdi32 -lruntimeobject -lws2_32 -lwinhttp
+# hidapi first: as a static archive its own dependencies (setupapi, cfgmgr32, ws2_32) resolve from
+# the libraries listed after it.
+LIBS     := -lhidapi -lhid -lsetupapi -lcfgmgr32 -lole32 -loleaut32 -lcomctl32 -lgdi32 -lruntimeobject -lws2_32 -lwinhttp
 
 SRC := $(wildcard src/*.cpp) $(wildcard src/drivers/*.cpp)
 OBJ := $(patsubst src/%.cpp,build/%.o,$(SRC)) build/app_res.o
 
-WirelessBattery.exe: $(OBJ)
+# HeadsetControl (third_party/HeadsetControl, GPL-3.0) is compiled into the exe as a static library.
+HSCLIB := build/hsc/lib/libheadsetcontrol.a
+
+WirelessBattery.exe: $(OBJ) $(HSCLIB)
 	$(CXX) $(LDFLAGS) $^ -o $@ $(LIBS)
+
+$(HSCLIB): third_party/HeadsetControl/CMakeLists.txt
+	cmake -S third_party/HeadsetControl -B build/hsc -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBRARY=OFF -DBUILD_UNIT_TESTS=OFF -DHEADSETCONTROL_VERSION=4.3.0
+	cmake --build build/hsc --target headsetcontrol_lib
+
+# Fires only when the submodule has not been checked out and the exe (which needs it) is built.
+third_party/HeadsetControl/CMakeLists.txt:
+	$(error HeadsetControl submodule missing - run: git submodule update --init)
 
 build/%.o: src/%.cpp $(wildcard src/*.h src/drivers/*.h)
 	@mkdir -p $(dir $@)

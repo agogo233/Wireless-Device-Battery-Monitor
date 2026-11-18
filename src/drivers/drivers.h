@@ -178,7 +178,7 @@ void PollPhoneLink(PollContext &ctx);      // phone linked with Microsoft Phone 
 void PollGalaxyBuds(PollContext &ctx);     // Samsung Galaxy Buds (Bluetooth RFCOMM, not HID)
 void PollMoondrop(PollContext &ctx);       // MOONDROP GM01 Pro headset (WalkPlay 2.4 GHz dongle)
 // Fallbacks.
-void PollHeadsetControl(PollContext &ctx); // only if headsetcontrol.exe is installed
+void PollHeadsetControl(PollContext &ctx); // extra headsets via the linked HeadsetControl library
 void PollGenericHid(PollContext &ctx);
 void PollBluetooth(PollContext &ctx);
 void PollXInput(PollContext &ctx);

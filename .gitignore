@@ -3,6 +3,7 @@ wireless-battery
 *.exe
 *.o
 dist/
-third_party/
+third_party/*
+!third_party/HeadsetControl
 .claude/
 CLAUDE.md

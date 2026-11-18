@@ -140,7 +140,7 @@ Hover for details. Click for the menu: every device (click one to hide or show i
 | **Niceboy** | MW400 on its 2.4 GHz receiver (`248A:FA02`, tested) | Read-only report `05` query `24 FA 48`; battery voltage mapped to 10% steps with the vendor app's table, charging flag |
 | **Bluetooth** | Anything that shows a battery in *Settings → Bluetooth & devices* (earbuds, headphones, BLE mice and keyboards) | Windows device property |
 | **Generic HID** | Devices reporting the standard HID *Battery Strength* usage | HID usage page 0x06 / 0x85 |
-| **HeadsetControl** | [Every headset it supports](https://github.com/Sapd/HeadsetControl#supported-headsets) (Audeze, Jabra, Sony INZONE, newer Logitech and more) | Bundled; runs `headsetcontrol -o json` |
+| **HeadsetControl** | [Every headset it supports](https://github.com/Sapd/HeadsetControl#supported-headsets) (Audeze, Jabra, Sony INZONE, newer Logitech and more) | Compiled in (HeadsetControl 4.3.0 static library), queried in-process |
 | **MAONO PD200W** | 2.4 GHz receiver (352F:040E) | Battery percentage; hardware-tested |
 
 
@@ -199,21 +199,22 @@ the only place the app connects to the internet, and only when you click Send.
 
 ## Build
 
-You need [MinGW-w64](https://www.mingw-w64.org/), e.g. from [MSYS2](https://www.msys2.org/) (`pacman -S mingw-w64-x86_64-gcc make`).
+You need [MinGW-w64](https://www.mingw-w64.org/), e.g. from [MSYS2](https://www.msys2.org/)
+(`pacman -S mingw-w64-x86_64-gcc make mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja mingw-w64-x86_64-hidapi`),
+plus the HeadsetControl submodule (`git submodule update --init`).
 
 ```
 make            # MSYS2 / any shell with make
-build.bat       # plain cmd with g++ and windres on PATH
+build.bat       # plain cmd with g++, cmake, ninja and windres on PATH
 ```
 
 To build the installer and portable zip, install [Inno Setup](https://jrsoftware.org/isinfo.php) and run
-`powershell -File installer\build-installer.ps1 -Version 1.0.0`. It downloads the pinned
-HeadsetControl release and verifies its checksum. GitHub Actions does all of this automatically:
-pushing a tag like `v1.0.0` publishes a release with the installer, the portable zip and the
-HeadsetControl source (as its GPL license requires).
+`powershell -File installer\build-installer.ps1 -Version 1.0.0`. GitHub Actions does all of this
+automatically: pushing a tag like `v1.0.0` publishes a release with the installer and the portable zip.
 
-`WirelessBattery.exe` on its own also works. Without `headsetcontrol.exe` next to it (or on `PATH`) you
-just lose the extra headsets.
+HeadsetControl is compiled into `WirelessBattery.exe` as a static library (GPL-3.0, like this project;
+its source ships with the repository as the `third_party/HeadsetControl` submodule), so the exe has no
+external dependencies.
 
 ## Linux (experimental)
 
