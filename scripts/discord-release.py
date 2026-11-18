@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Posts a release announcement to Discord: first what changed, then the newly supported devices.
 
-Runs in the release job of .github/workflows/build.yml after a version tag is published. It reads the
+Runs in the release job of .github/workflows/build.yml.disabled (the tag release pipeline, renamed to
+deactivate it; rename it back to build.yml to publish again) after a version tag is published. It reads the
 history between the previous tag and this one, so nothing has to be written by hand:
   * every merged pull request ("Merge PR #N" / "Merge pull request #N") and every direct commit
   * a change that adds a driver file, or whose title adds a device, counts as a new device
